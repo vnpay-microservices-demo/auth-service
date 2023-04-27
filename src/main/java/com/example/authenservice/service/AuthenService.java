@@ -1,5 +1,6 @@
 package com.example.authenservice.service;
 
+import com.example.authenservice.constant.CacheConstant;
 import com.example.authenservice.constant.UserSessionConstant;
 import com.example.authenservice.exception.BadRequestException;
 import com.example.authenservice.request.LoginRequest;
@@ -18,23 +19,29 @@ import java.util.Map;
 
 @Service
 public class AuthenService {
-    private static final BCryptPasswordEncoder B_CRYPT_ENCODER = new BCryptPasswordEncoder();
+//    private static final BCryptPasswordEncoder B_CRYPT_ENCODER = new BCryptPasswordEncoder();
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserService userService;
+    @Autowired
+    private RedisCacheService cacheService;
     @Value("${application.authentication.access_token.life_time}")
     private long tokenLifeTime;
     @Value("${application.authentication.access_token.secret}")
     private String jwtSecret;
 
     public AuthResponse login(LoginRequest loginRequest){
-        if(!B_CRYPT_ENCODER.matches(loginRequest.getPassword(),
+        if(!passwordEncoder.matches(loginRequest.getPassword(),
                 userService.loadUserByUsername(loginRequest.getUsername()).getPassword())){
             throw new BadRequestException("Invalid username or password.");
         }
         String userid = userService.loadUserByUsername(loginRequest.getUsername()).getId();
-        return AuthResponse.of(UserSessionConstant.getUserSessionId(userid), generateAccessToken(userid,loginRequest.getUsername()));
+        String sessionId = UserSessionConstant.getUserSessionId(userid);
+        String token = generateAccessToken(userid,loginRequest.getUsername());
+        cacheService.set(sessionId,token);
+
+        return AuthResponse.of(sessionId,token);
     }
     private String generateAccessToken(String userId, String username){
         Map<String,Object> claims = new HashMap<>();
