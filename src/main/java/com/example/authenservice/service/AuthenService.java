@@ -7,6 +7,7 @@ import com.example.authenservice.request.LoginRequest;
 import com.example.authenservice.response.AuthResponse;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class AuthenService {
 //    private static final BCryptPasswordEncoder B_CRYPT_ENCODER = new BCryptPasswordEncoder();
     @Autowired
