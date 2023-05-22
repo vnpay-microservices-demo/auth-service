@@ -15,11 +15,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/authen")
 @Slf4j
 public class Controller {
+    private static final long start = System.currentTimeMillis();
+    private static final  long end = start + 10000;
     @Autowired
     private AuthenService authenService;
+//    @PostMapping("/login")
+//    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) throws InterruptedException {
+//        log.info("into instance");
+//        return ResponseEntity.ok(authenService.login(loginRequest));
+//    }
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) throws InterruptedException {
         log.info("into instance");
-        return ResponseEntity.ok(authenService.login(loginRequest));
+        log.info("end date is: {}", end);
+        long currenDate = System.currentTimeMillis();
+        log.info("current date is: {}", currenDate);
+        if(currenDate < end){
+            return ResponseEntity.ok("data from instance error");
+        }
+        return ResponseEntity.internalServerError().build();
     }
 }
